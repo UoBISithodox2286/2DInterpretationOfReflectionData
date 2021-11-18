@@ -1,7 +1,7 @@
-function [amount,Pin,modulus_distance,Skewness,K_check,line,Lower_coef,Upper_coef] = DistributionTube(norm,esd,DataName,plot_individual,plot_line)
+function [amount,Pin,modulus_distance,Skewness,line,Lower_coef,Upper_coef] = DistributionTube(norm,esd,DataName,plot_individual,plot_line)
 %% Quick Usage
 
-% Use with ExludeOutliers.m,readHKL.m and the .cif or .hkl file.
+% Use with DataPointDensity.m, ExludeOutliers.m,readHKL.m and the .cif or .hkl file.
 
 % Such as:
 %(in folder xxx)
@@ -9,26 +9,37 @@ function [amount,Pin,modulus_distance,Skewness,K_check,line,Lower_coef,Upper_coe
 %   readHKL.m
 %   ExcludeOutliers.m
 %   DistributionTube.m
+%   DataPointDensity.m
 %   O084.cif
 %   ...
 
 % Example:
 %   O084=readHKL('O084.cif',5);
 %   [O084N,O084E,O084I,O084S] = ExcludeOutliers(O084);
-%   [O084A,O084Pin,O084M,O084Sk,O084K] = DistributionTube(O084N,O084E,'O084',true,true);
+%   [O084A,O084Pin,O084M,O084Sk] = DistributionTube(O084N,O084E,'O084',true,true);
 
 % Use with function ExcludeOutliers.m and readHKL.m
 
-% norm - normalized intensity;
-% esd - error/normalized intensity;
-% DataName - name or ID of the crystal in text form, ie. 'SuperSugar' or 'O084'
-% plot_inividual - true or false;
+%% Input Variables
+    % norm - normalized intensity;
+    % esd - error/normalized intensity;
+    % DataName - name or ID of the crystal in text form, ie. 'SuperSugar' or 'O084'
+    % plot_inividual - true or false;
     %- true: show the full norm vs.esd plot of the crystal
     %- false: doesn't show the full plot;
-% plot_line - if plot_individual = ture, show the datapoints on the plot or not
+    % plot_line - if plot_individual = ture, show the datapoints on the plot or not
     % works only when plot_individual = ture, otherwise plz leave as false;
     %- true: show boundary lines, but hides all datapoints;
     %- false: show both boundary lines and datapoints;
+    
+%% Output Variables
+    % amount - the selected data points;
+    % Pin - upper and lower knee points;
+    % modulus_distance - knee point distance;
+    % Skewness - skewness measurement;
+    % line - the central line of the tube of sampling;
+    % Lower_coef - Coefficients for curve fit to the lower boundary of the knee shape;
+    % Upper_coef - Coefficients for curve fit to the upper boundary of the knee shape;
 
 %% Window method
     % build a complete description on the points and eradicate all unreasonable points
@@ -257,7 +268,6 @@ modulus_distance = pdist(points_d,'euclidean');
 %% Skewness
     occurance_vector = DataPointDensity(amount,DataName,false);
     Skewness = skewness(occurance_vector);
-    K_check = kurtosis(occurance_vector,0);
     
 %% Plot
     if plot_individual(1) == true
