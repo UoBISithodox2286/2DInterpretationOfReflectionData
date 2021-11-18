@@ -9,9 +9,9 @@
  You will need some hkl data to operate with, put them in the same folder as all the codes.
  
  You will also need to install matlab toolbox containing the following functions:
-     find()
-     fit()
-     boundary()
-     pdist()
-     skewness()
+     find();
+     fit();
+     boundary();
+     pdist();
+     skewness();
      
