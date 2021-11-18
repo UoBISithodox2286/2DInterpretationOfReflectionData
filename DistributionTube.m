@@ -267,7 +267,7 @@ modulus_distance = pdist(points_d,'euclidean');
     amount = [localX',count'];
     
 %% Skewness
-    occurance_vector = DataPointDensity(amount,DataName,false);
+    occurance_vector = DataPointDensity(amount);
     Skewness = skewness(occurance_vector);
     
 %% Plot
