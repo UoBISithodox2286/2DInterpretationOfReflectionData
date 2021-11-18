@@ -1,13 +1,14 @@
 function [amount,Pin,modulus_distance,Skewness,line,Lower_coef,Upper_coef] = DistributionTube(norm,esd,DataName,plot_individual,plot_line)
 %% Quick Usage
 
-% Use with DataPointDensity.m, ExludeOutliers.m,readHKL.m and the .cif or .hkl file.
+% Use with Turn45.m, DataPointDensity.m, ExludeOutliers.m,readHKL.m and the .cif or .hkl file.
 
 % Such as:
 %(in folder xxx)
 %   ...
 %   readHKL.m
 %   ExcludeOutliers.m
+%   Turn45.m
 %   DistributionTube.m
 %   DataPointDensity.m
 %   O084.cif
