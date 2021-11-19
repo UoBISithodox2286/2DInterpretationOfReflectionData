@@ -59,11 +59,11 @@ function [amount,Pin,modulus_distance,Skewness,line,Lower_coef,Upper_coef] = Dis
 
     % find a step value and implement it
     pp = unique(sortrows(pp),'rows');
-    a = 1:50:length(pp(:,1))-10;
+    a = 1:50:length(pp(:,1));
 
-    for n = 1:length(a)
+    for n = 1:length(a)-1
         % find points within the left and right boundaries (window)
-        localpp = pp(a(n):(a(n)+10),:);
+        localpp = pp(a(n):a(n+1),:);
         % find points with local min(y) and max(y)
         minP = find(localpp(:,2)==min(localpp(:,2)));
         maxP = find(localpp(:,2)==max(localpp(:,2)));
@@ -151,14 +151,15 @@ function [amount,Pin,modulus_distance,Skewness,line,Lower_coef,Upper_coef] = Dis
     
 %% Fitting for funtions
 ft = fittype('(a/(b^x))+c');
-LowerLine=fit(LowBound(:,1),LowBound(:,2),ft,'StartPoint',[0,1,min(LowBound(:,2))]);
-UpperLine=fit(UpBound(:,1),UpBound(:,2),ft,'StartPoint',[0,1,min(UpBound(:,2))]);
+
+LowerLine=fit(LowBound(:,1),LowBound(:,2),ft,'StartPoint',[0,1,0]);
+UpperLine=fit(UpBound(:,1),UpBound(:,2),ft,'StartPoint',[0,1,0]);
 
 Lower_coef = [LowerLine.a,LowerLine.b,LowerLine.c];
 Upper_coef = [UpperLine.a,UpperLine.b,UpperLine.c];
 
 FitLow = LowerLine(LowBound(:,1));
-FitHigh = UpperLine(UpBound(:,1));
+FitUp = UpperLine(UpBound(:,1));
 %% Find Lower Knee via approximating with slope
    idxL = Inf;
     % Slope method, Lowbound
@@ -272,7 +273,7 @@ modulus_distance = pdist(points_d,'euclidean');
     
 %% Plot
     if plot_individual(1) == true
-        figure; grid on; hold on;
+        figure; grid off; hold on;
         xticks(min(norm):0.1:max(norm));
         yticks(min(esd):0.1:max(esd));
         xlim([min(xVals),max(xVals)])
@@ -284,15 +285,15 @@ modulus_distance = pdist(points_d,'euclidean');
         plot(p2(1),p2(2),'g*');
         plot(points_d(:,1),points_d(:,2),'g-');
         plot(Pcrs(1),Pcrs(2),'m*');
+        plot(LowBound(:,1),LowBound(:,2),'Color','#7E2F8E'); 
+        
         if plot_line == true
-            legend('Selected Points','Lower Elbow Point','Upper Elbow Point','Elbow Distance'...
-            ,'Furtherest Point in Range','Location','northwest','AutoUpdate','off')
+            legend('Sampled Points In the Tube','Lower Knee Point','Upper Knee Point','Between Knee Distance'...
+            ,'End of the Tube','Lower and Upper Boundaries','Location','northwest','AutoUpdate','off')
         else
             legend('Lower Knee Point','Upper Knee Point','Between Knee Distance'...
             ,'End of the Tube','Location','northwest','AutoUpdate','off')
         end
-        
-        plot(LowBound(:,1),LowBound(:,2),'Color','#7E2F8E'); 
         plot(UpBound(:,1),UpBound(:,2),'Color','#7E2F8E'); 
         if plot_line == true
             plot(norm(:),esd(:),'.'); 
@@ -305,8 +306,8 @@ modulus_distance = pdist(points_d,'euclidean');
         plot(xVals(:),yVals(:),'Color','#77AC30'); hold off
         plot_1_title = append('Data Selected of',' ',DataName);
         title(plot_1_title);
-        xlabel('Normalised Intensity');
-        ylabel('sigma/I');
+        xlabel('Normalised Intensity (Norm(I))');
+        ylabel('e.s.d./ Normalized Intensity')
 
         figure;grid on; 
         plot(amount(:,1),smooth(amount(:,2)));
@@ -317,12 +318,14 @@ modulus_distance = pdist(points_d,'euclidean');
         
         figure; hold on; grid on;
         plot_3_title = append('Curve fitting result',' ',DataName);
-        plot(LowBound(:,1),FitLow(:),'r--'); 
-        plot(UpBound(:,1),FitHigh(:),'b--'); 
-        plot(LowBound(:,1),LowBound(:,2),'c-'); 
-        plot(UpBound(:,1),UpBound(:,2),'g-'); 
-        legend('Fitted Curve for Lower Boundary','Fitted Curve for Upper Boundary'...
-            ,'Lower Boundary','Upper Boundary')
+        plot(LowBound(:,1),FitLow(:),'r-'); 
+        plot(UpBound(:,1),FitUp(:),'b-'); 
+         plot(LowBound(:,1),LowBound(:,2),'c--'); 
+        legend(sprintf('Approximate Lower Bound: %.1d.2/(%.1d^x) + %.1d\n',Lower_coef(1),Lower_coef(2),Lower_coef(3)),...
+            sprintf('Approximate Up Bound: %.1d.2/(%.1d^x) + %.1d\n',Upper_coef(1),Upper_coef(2),Upper_coef(3)),...
+            'Exact Boundaries','AutoUpdate','off')
+        
+        plot(UpBound(:,1),UpBound(:,2),'c--'); 
         title(plot_3_title);
         hold off
     end
