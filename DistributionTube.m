@@ -1,4 +1,4 @@
-function [amount,Pin,modulus_distance,Skewness,line,Lower_coef,Upper_coef] = DistributionTube(norm,esd,DataName,plot_individual,plot_line)
+function [amount,Pin,modulus_distance,LowerLine,UpperLine,Skewness,line] = DistributionTube(norm,esd,DataName,plot_individual,plot_line)
 %% Quick Usage
 
 % Use with Turn45.m, DataPointDensity.m, ExludeOutliers.m,readHKL.m and the .cif or .hkl file.
@@ -37,11 +37,11 @@ function [amount,Pin,modulus_distance,Skewness,line,Lower_coef,Upper_coef] = Dis
     % amount - the selected data points;
     % Pin - upper and lower knee points;
     % modulus_distance - knee point distance;
-    % Skewness - skewness measurement;
     % line - the central line of the tube of sampling;
-    % Lower_coef - Coefficients for curve fit to the lower boundary of the knee shape;
-    % Upper_coef - Coefficients for curve fit to the upper boundary of the knee shape;
-
+    % LowerLine - curve fit object to the lower boundary of the knee shape;
+    % UpperLine - curve fit object to the upper boundary of the knee shape;
+    % Skewness - General Skewness measurement, an abandoned indicator;
+    
 %% Window method
     % build a complete description on the points and eradicate all unreasonable points
     pp = [norm,esd];
@@ -321,8 +321,8 @@ modulus_distance = pdist(points_d,'euclidean');
         plot(LowBound(:,1),FitLow(:),'r-'); 
         plot(UpBound(:,1),FitUp(:),'b-'); 
          plot(LowBound(:,1),LowBound(:,2),'c--'); 
-        legend(sprintf('Approximate Lower Bound: %.1d.2/(%.1d^x) + %.1d\n',Lower_coef(1),Lower_coef(2),Lower_coef(3)),...
-            sprintf('Approximate Up Bound: %.1d.2/(%.1d^x) + %.1d\n',Upper_coef(1),Upper_coef(2),Upper_coef(3)),...
+        legend(sprintf('Approximate Lower Bound: %.1d.2/(%.1d)^x + %.1d\n',Lower_coef(1),Lower_coef(2),Lower_coef(3)),...
+            sprintf('Approximate Up Bound: %.1d.2/(%.1d)^x + %.1d\n',Upper_coef(1),Upper_coef(2),Upper_coef(3)),...
             'Exact Boundaries','AutoUpdate','off')
         
         plot(UpBound(:,1),UpBound(:,2),'c--'); 
@@ -335,10 +335,10 @@ modulus_distance = pdist(points_d,'euclidean');
     
     formatSpec2 = append(DataName,' best fitted Curve of its Lower boundary:\n');
     fprintf(formatSpec2);
-    fprintf('%.4d.2/(%.4d^x) + %.4d\n',Lower_coef(1),Lower_coef(2),Lower_coef(3));
+    fprintf('%.4d.2/(%.4d)^x + %.4d\n',Lower_coef(1),Lower_coef(2),Lower_coef(3));
     
     formatSpec3 = append(DataName,' best fitted Curve of its Upper boundary:\n');
     fprintf(formatSpec3);
-    fprintf('%.4d/(%.4d^x) + %.4d\n\n',Upper_coef(1),Upper_coef(2),Upper_coef(3));
+    fprintf('%.4d/(%.4d)^x + %.4d\n\n',Upper_coef(1),Upper_coef(2),Upper_coef(3));
 end
 
